@@ -1,0 +1,2 @@
+initBoardAndCards();
+launchGame();
