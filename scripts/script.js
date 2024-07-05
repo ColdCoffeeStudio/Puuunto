@@ -17,6 +17,7 @@ function initBoardTracker() {
  */
 function addListeners(){
     let rows = board.getElementsByTagName("tr");
+
     for (let rowId = 0; rowId < ROW_LENGTH; rowId++){
         let row = rows[rowId];
         let columns = row.getElementsByTagName("td");
@@ -39,9 +40,11 @@ function clickedCell(cell){
     let currentPlayerCards = currentPlayerDeck.cards;
 
     if(currentPlayerCards.length > 0){
-        let drawnCard = currentPlayerCards.pop()
+        let drawnCard = currentPlayerCards[currentPlayerCards.length-1];
         let cellCoordinates = cell.cellIndex + ';' + cell.parentNode.rowIndex;
         if(askToPlaceCard(cellCoordinates,drawnCard)){
+            console.log("Card can be placed");
+            currentPlayerCards.pop();
             placeCard(cell,drawnCard);
         }
     }else{
@@ -51,13 +54,13 @@ function clickedCell(cell){
 
 function askToPlaceCard(cellCoordinates, card) {
     try{
-        let coordinatesString = cell.cellIndex + cell.pare
         let canPlace = false;
-        //let availablePlacements = getAvailablePlacements();
-        let availablePlacements = [];
-
         checkCardData(card);
-        if(cellCoordinates in availablePlacements){
+
+        let availablePlacements = getAvailablePlacements(card.dots);
+        console.log(availablePlacements.includes(cellCoordinates));
+
+        if(availablePlacements.includes(cellCoordinates)){
             canPlace = true;
         }
 
@@ -67,12 +70,66 @@ function askToPlaceCard(cellCoordinates, card) {
     }
 }
 
+function getAvailablePlacements(cardDots) {
+    let availablePlacements = [];
+    let playedCoordinates = [];
+    let cardEncountered = 0;
+
+    // Get played cell where the actual card can be superposed.
+    for (let rowId = 0; rowId < ROW_LENGTH; rowId++) {
+        let row = boardTracker[rowId];
+        for (let columnId = 0; columnId < COLUMN_LENGTH; columnId++) {
+            let cell = row[columnId];
+            if(cell.dots !== undefined){
+                let currentCoordinates = columnId+";"+rowId;
+                cardEncountered++;
+                playedCoordinates.push(currentCoordinates);
+                if(cardDots > cell.dots){
+                    availablePlacements.push(currentCoordinates);
+                }
+            }
+        }
+    }
+
+    // Get not-played adjacent cell;
+    for (let cellIndex = 0; cellIndex < playedCoordinates.length; cellIndex++) {
+        let cellCoordinates = playedCoordinates[cellIndex].split(";");
+        let cellColumnId = parseInt(cellCoordinates[0]);
+        let cellRowId = parseInt(cellCoordinates[1]);
+
+        for (let rowOffset = -1; rowOffset <= 1; rowOffset++) {
+            let adjacentRow = cellRowId + rowOffset;
+
+            if((adjacentRow >= 0) && (adjacentRow < ROW_LENGTH)){
+                for (let columnOffset = -1; columnOffset <= 1; columnOffset++) {
+                    let adjacentColumn = cellColumnId + columnOffset;
+
+                    if((adjacentColumn >= 0) && (adjacentColumn < COLUMN_LENGTH)){
+                        let adjacentCoordinates = adjacentColumn + ";" + adjacentRow;
+                        if(!availablePlacements.includes(adjacentCoordinates) && !playedCoordinates.includes(adjacentCoordinates)){
+                            availablePlacements.push(adjacentCoordinates);
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
+    if (cardEncountered === 0){
+        availablePlacements.push("5;5");
+    }
+
+    return availablePlacements;
+}
+
 /**
  * This function allows to place the given card if the card is considered as correct.
  * @param cell The cell where the card will be placed.
  * @param card The card to place.
  */
 function placeCard(cell, card){
+    boardTracker[cell.parentNode.rowIndex][cell.cellIndex] = card;
     cell.innerText = card.dots;
     changeColor(cell, card.color);
 }

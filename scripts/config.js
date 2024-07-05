@@ -16,10 +16,14 @@ function initBoard() {
         // Create columns
         for (let columnId = 0; columnId < COLUMN_LENGTH; columnId++){
             let tmpBoardCell = document.createElement("td");
-            tmpBoardCell.innerText = `${columnId};${rowId}`;
             tmpBoardCell.style.height = "64px";
             tmpBoardCell.style.width = "64px";
             tmpBoardCell.style.textAlign = "center";
+            if(rowId === 5 && columnId === 5){
+                tmpBoardCell.style.border = "2px solid red";
+            }else{
+                tmpBoardCell.style.border = "1px solid black";
+            }
             tmpBoardRow.appendChild(tmpBoardCell);
 
         }
