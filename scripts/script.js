@@ -1,4 +1,16 @@
 let board = document.getElementById("board");
+let currentPlayer;
+let boardTracker = [];
+
+function initBoardTracker() {
+    for (let rowId = 0; rowId < ROW_LENGTH; rowId++) {
+        let row = []
+        for (let columnId = 0; columnId < COLUMN_LENGTH; columnId++) {
+            row.push({});
+        }
+        boardTracker.push(row);
+    }
+}
 
 /**
  * This function add an event listener to each cell of the board that calls for the method 'clickedCell'.
@@ -23,25 +35,46 @@ function addListeners(){
  * @param cell The clicked cell.
  */
 function clickedCell(cell){
-    let columnId = cell.cellIndex;
-    let rowId = cell.parentNode.rowIndex;
-    let card = cards[Math.floor(Math.random() * cards.length)];
+    let currentPlayerDeck = currentPlayer.deck;
+    let currentPlayerCards = currentPlayerDeck.cards;
 
-    console.log(columnId + ";" + rowId);
-    console.log(cards);
-    console.log(card);
-
-    placeCard(cell, card);
+    if(currentPlayerCards.length > 0){
+        let drawnCard = currentPlayerCards.pop()
+        let cellCoordinates = cell.cellIndex + ';' + cell.parentNode.rowIndex;
+        if(askToPlaceCard(cellCoordinates,drawnCard)){
+            placeCard(cell,drawnCard);
+        }
+    }else{
+        console.log("No card left...");
+    }
 }
 
-function placeCard(cell, card){
+function askToPlaceCard(cellCoordinates, card) {
     try{
+        let coordinatesString = cell.cellIndex + cell.pare
+        let canPlace = false;
+        //let availablePlacements = getAvailablePlacements();
+        let availablePlacements = [];
+
         checkCardData(card);
-        cell.innerText = card.dots;
-        changeColor(cell, card.color);
+        if(cellCoordinates in availablePlacements){
+            canPlace = true;
+        }
+
+        return canPlace;
     }catch (error) {
         console.error(error);
     }
+}
+
+/**
+ * This function allows to place the given card if the card is considered as correct.
+ * @param cell The cell where the card will be placed.
+ * @param card The card to place.
+ */
+function placeCard(cell, card){
+    cell.innerText = card.dots;
+    changeColor(cell, card.color);
 }
 
 function changeColor(cell, color) {
@@ -84,5 +117,8 @@ function checkCardData(card){
  * This method launchs the game.
  */
 function launchGame(){
+    currentPlayer = players[0];
+    console.log(currentPlayer);
+    initBoardTracker();
     addListeners();
 }

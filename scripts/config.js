@@ -2,7 +2,8 @@
 const ROW_LENGTH = 11;
 const COLUMN_LENGTH = 11;
 
-let cards = [];
+let decks = [];
+let players = [];
 
 function initBoard() {
     // Create the HTML board with ROW_LENGTH rows and COLUMN_LENGTH columns. Each cell is 64px x 64px.
@@ -33,16 +34,33 @@ function initCards(){
 
     for(let colorIndex = 0; colorIndex < colors.length; colorIndex++){
         let colorValue = colors[colorIndex];
+        let deck = [];
         for (let dotsIndex = 0; dotsIndex < dots.length; dotsIndex++) {
             let dotsValue = dots[dotsIndex];
-            cards.push({dots: dotsValue, color: colorValue});
-            cards.push({dots: dotsValue, color: colorValue});
+            deck.push({dots: dotsValue, color: colorValue});
+            deck.push({dots: dotsValue, color: colorValue});
         }
+        decks.push({cards: deck, color:colorValue});
     }
-    console.log(cards);
-
 }
+
+function initPlayers() {
+    let playerNames = ["Erwan", "William", "Stévan", "Tanguy"];
+    let playerBirthdates = ["2002-07-18", "2003-02-18", "2002-01-29", "2002-10-10"];
+
+    for (let playerIndex = 0; playerIndex < playerNames.length; playerIndex++) {
+        let playerName = playerNames[playerIndex];
+        let playerBirthdate = playerBirthdates[playerIndex];
+        let playerDeck = decks.pop();
+
+        players.push({name: playerName, birthdate: playerBirthdate, deck: playerDeck, nbWonRounds: 0, nbWonGames: 0});
+    }
+
+    console.log(players);
+}
+
 function initBoardAndCards(){
     initBoard();
     initCards();
+    initPlayers();
 }
