@@ -1,4 +1,5 @@
 let board = document.getElementById("board");
+let currentPlayerIndex = 0;
 let currentPlayer;
 let boardTracker = [];
 
@@ -46,6 +47,7 @@ function clickedCell(cell){
             console.log("Card can be placed");
             currentPlayerCards.pop();
             placeCard(cell,drawnCard);
+            changeCurrentPlayer();
         }
     }else{
         console.log("No card left...");
@@ -151,6 +153,11 @@ function changeColor(cell, color) {
     }
 }
 
+function changeCurrentPlayer() {
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    currentPlayer = players[currentPlayerIndex];
+}
+
 /**
  * This method checks if the card is correct.
  * It throws an error if it isn't.
@@ -174,7 +181,7 @@ function checkCardData(card){
  * This method launchs the game.
  */
 function launchGame(){
-    currentPlayer = players[0];
+    currentPlayer = players[currentPlayerIndex];
     console.log(currentPlayer);
     initBoardTracker();
     addListeners();

@@ -48,6 +48,20 @@ function initCards(){
     }
 }
 
+function shuffleDeck(deck) {
+    let deckColor = deck.color;
+    let deckCards = deck.cards;
+    
+    for (let cardIndex = deckCards.length - 1; cardIndex > 0; cardIndex--) {
+        let otherCardIndex = Math.floor(Math.random() * (cardIndex + 1));
+        let temp = deckCards[cardIndex];
+        deckCards[cardIndex] = deckCards[otherCardIndex];
+        deckCards[otherCardIndex] = temp;
+    }
+    
+    return {cards: deckCards, color:deckColor};
+}
+
 function initPlayers() {
     let playerNames = ["Erwan", "William", "Stévan", "Tanguy"];
     let playerBirthdates = ["2002-07-18", "2003-02-18", "2002-01-29", "2002-10-10"];
@@ -55,7 +69,7 @@ function initPlayers() {
     for (let playerIndex = 0; playerIndex < playerNames.length; playerIndex++) {
         let playerName = playerNames[playerIndex];
         let playerBirthdate = playerBirthdates[playerIndex];
-        let playerDeck = decks.pop();
+        let playerDeck = shuffleDeck(decks.pop());
 
         players.push({name: playerName, birthdate: playerBirthdate, deck: playerDeck, nbWonRounds: 0, nbWonGames: 0});
     }
