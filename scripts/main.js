@@ -1,2 +1,2 @@
-initBoardAndCards();
+initGame();
 launchGame();

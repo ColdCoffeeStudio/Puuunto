@@ -1,0 +1,7 @@
+#card {
+    width: 64px;
+    padding-bottom: 26px;
+    padding-top: 26px;
+    text-align: center;
+    border: 1px solid black;
+}

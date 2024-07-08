@@ -1,8 +1,16 @@
-let board = document.getElementById("board");
-let currentPlayerIndex = 0;
+const BOARD = document.getElementById("board");
+const PLAYER_NAME_PREVIEW = document.getElementById("player_name");
+const CARD_PREVIEW = document.getElementById("card");
+
+let currentPlayerIndex;
 let currentPlayer;
 let boardTracker = [];
+let drawnCard = {};
 
+/**
+ * This method initialize a tracker to know the value of every cell in the board.
+ * The tracker is then updated when a card is placed.
+ */
 function initBoardTracker() {
     for (let rowId = 0; rowId < ROW_LENGTH; rowId++) {
         let row = []
@@ -14,10 +22,34 @@ function initBoardTracker() {
 }
 
 /**
+ * Update the preview to display the drawn card and the name of the current player.
+ */
+function updatePreview() {
+    PLAYER_NAME_PREVIEW.innerText = currentPlayer.name;
+    let color = drawnCard.color;
+    CARD_PREVIEW.innerText = drawnCard.dots;
+
+    switch (color) {
+        case 'blue':
+            CARD_PREVIEW.style.backgroundColor = '#118ab2';
+            break;
+        case 'red':
+            CARD_PREVIEW.style.backgroundColor = '#ef476f';
+            break
+        case 'yellow':
+            CARD_PREVIEW.style.backgroundColor = '#ffd166';
+            break;
+        case 'green':
+            CARD_PREVIEW.style.backgroundColor = '#06d6a0';
+            break;
+    }
+}
+
+/**
  * This function add an event listener to each cell of the board that calls for the method 'clickedCell'.
  */
 function addListeners(){
-    let rows = board.getElementsByTagName("tr");
+    let rows = BOARD.getElementsByTagName("tr");
 
     for (let rowId = 0; rowId < ROW_LENGTH; rowId++){
         let row = rows[rowId];
@@ -32,28 +64,49 @@ function addListeners(){
 }
 
 /**
+ * This method draw a card from the current player's deck.
+ * @returns card
+ */
+function drawCard() {
+    let card = {};
+    let currentPlayerDeck = currentPlayer.deck;
+
+    if (currentPlayerDeck.length > 0){
+        card = currentPlayerDeck.pop();
+    }else{
+        throw new Error("Error - drawCard - The player doesn't have cards.");
+    }
+
+    return card;
+}
+
+/**
  * This function is called when a cell of the table is clicked;
  * For now, it prints the coordinates of the clicked cell.
  * @param cell The clicked cell.
  */
 function clickedCell(cell){
-    let currentPlayerDeck = currentPlayer.deck;
-    let currentPlayerCards = currentPlayerDeck.cards;
 
-    if(currentPlayerCards.length > 0){
-        let drawnCard = currentPlayerCards[currentPlayerCards.length-1];
+    try {
         let cellCoordinates = cell.cellIndex + ';' + cell.parentNode.rowIndex;
+
         if(askToPlaceCard(cellCoordinates,drawnCard)){
-            console.log("Card can be placed");
-            currentPlayerCards.pop();
-            placeCard(cell,drawnCard);
+            placeCard(cell, drawnCard);
             changeCurrentPlayer();
         }
-    }else{
-        console.log("No card left...");
+
+    }catch (error) {
+        console.log(error);
     }
+
 }
 
+/**
+ * This method checks if the given card can be placed at the given coordinates.
+ * @param cellCoordinates The coordinates of the cell.
+ * @param card The card to place.
+ * @returns boolean
+ */
 function askToPlaceCard(cellCoordinates, card) {
     try{
         let canPlace = false;
@@ -72,6 +125,11 @@ function askToPlaceCard(cellCoordinates, card) {
     }
 }
 
+/**
+ * This method gets and returns every available placement on the board for the current card.
+ * @param cardDots The number of dots the card possess.
+ * @returns *[]
+ */
 function getAvailablePlacements(cardDots) {
     let availablePlacements = [];
     let playedCoordinates = [];
@@ -136,6 +194,11 @@ function placeCard(cell, card){
     changeColor(cell, card.color);
 }
 
+/**
+ * This method changes the background color of the given cell to match the placed card color.
+ * @param cell The cell to change.
+ * @param color The color of the card.
+ */
 function changeColor(cell, color) {
     switch (color) {
         case 'blue':
@@ -153,9 +216,19 @@ function changeColor(cell, color) {
     }
 }
 
+/**
+ * This method changes the current player to the next one.
+ */
 function changeCurrentPlayer() {
-    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    currentPlayer = players[currentPlayerIndex];
+    try{
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+        currentPlayer = players[currentPlayerIndex];
+        drawnCard = drawCard();
+        updatePreview();
+    }catch (error){
+        console.log(error);
+    }
+
 }
 
 /**
@@ -178,11 +251,19 @@ function checkCardData(card){
 }
 
 /**
- * This method launchs the game.
+ * This method launches the game.
  */
 function launchGame(){
-    currentPlayer = players[currentPlayerIndex];
+    currentPlayerIndex = 0;
+
+    currentPlayer = players[0];
+    drawnCard = drawCard();
     console.log(currentPlayer);
+
+    console.log(CARD_PREVIEW);
+    console.log(PLAYER_NAME_PREVIEW);
+
     initBoardTracker();
+    updatePreview();
     addListeners();
 }

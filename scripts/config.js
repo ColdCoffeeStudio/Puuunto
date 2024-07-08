@@ -1,10 +1,16 @@
 // Define the max size of the board. A limit of 6x6 will be calculated later in script.js according to the game rules.
 const ROW_LENGTH = 11;
 const COLUMN_LENGTH = 11;
+const COLORS = ["blue","red","yellow","green"];
+const DOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 let decks = [];
 let players = [];
 
+/**
+ * This method initializes a ROW_LENGTH by COLUMN_LENGTH board.
+ * Listeners are handled in script.js.
+ */
 function initBoard() {
     // Create the HTML board with ROW_LENGTH rows and COLUMN_LENGTH columns. Each cell is 64px x 64px.
     let boardDiv = document.getElementById("board");
@@ -32,26 +38,34 @@ function initBoard() {
     boardDiv.appendChild(boardTable);
 }
 
-function initCards(){
-    let colors = ["blue","red","yellow","green"];
-    let dots = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    for(let colorIndex = 0; colorIndex < colors.length; colorIndex++){
-        let colorValue = colors[colorIndex];
+/**
+ * This function initialize the decks with 18 cards for each color.
+ * Decks are separated depending on their colours to be distributed later.
+ */
+function initCards(){
+
+    for(let colorIndex = 0; colorIndex < COLORS.length; colorIndex++){
+        let colorValue = COLORS[colorIndex];
         let deck = [];
-        for (let dotsIndex = 0; dotsIndex < dots.length; dotsIndex++) {
-            let dotsValue = dots[dotsIndex];
+        for (let dotsIndex = 0; dotsIndex < DOTS.length; dotsIndex++) {
+            let dotsValue = DOTS[dotsIndex];
             deck.push({dots: dotsValue, color: colorValue});
             deck.push({dots: dotsValue, color: colorValue});
         }
-        decks.push({cards: deck, color:colorValue});
+        decks.push(deck);
     }
 }
 
+/**
+ * This method shuffle the given deck using the Durstenfeld shuffle algorithm.
+ * @param deck The deck to shuffle.
+ * @returns deckCards
+ */
 function shuffleDeck(deck) {
-    let deckColor = deck.color;
-    let deckCards = deck.cards;
-    
+    let deckCards = deck;
+
+    // Shuffle the deck using Durstenfeld shuffle algorithm.
     for (let cardIndex = deckCards.length - 1; cardIndex > 0; cardIndex--) {
         let otherCardIndex = Math.floor(Math.random() * (cardIndex + 1));
         let temp = deckCards[cardIndex];
@@ -59,13 +73,20 @@ function shuffleDeck(deck) {
         deckCards[otherCardIndex] = temp;
     }
     
-    return {cards: deckCards, color:deckColor};
+    return deckCards;
 }
 
+/**
+ * This method initializes the players. Each player is defined by a name, a birthdate and a set of cards.
+ * Cards are shuffled before they are given to the player.
+ * For 4 players, each player gets a deck of a colour.
+ */
 function initPlayers() {
+    // Place-holders for now.
     let playerNames = ["Erwan", "William", "Stévan", "Tanguy"];
     let playerBirthdates = ["2002-07-18", "2003-02-18", "2002-01-29", "2002-10-10"];
 
+    // Distribution for 4 players.
     for (let playerIndex = 0; playerIndex < playerNames.length; playerIndex++) {
         let playerName = playerNames[playerIndex];
         let playerBirthdate = playerBirthdates[playerIndex];
@@ -74,10 +95,13 @@ function initPlayers() {
         players.push({name: playerName, birthdate: playerBirthdate, deck: playerDeck, nbWonRounds: 0, nbWonGames: 0});
     }
 
-    console.log(players);
 }
 
-function initBoardAndCards(){
+/**
+ * This method initializes the board, cards and players.
+ * Each player gets their cards in this section, so the game can start in another script.
+ */
+function initGame(){
     initBoard();
     initCards();
     initPlayers();
