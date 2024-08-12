@@ -6,6 +6,7 @@ const DOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 let decks = [];
 let players = [];
+let streakLengthGoal = 0;
 
 /**
  * This method initializes a ROW_LENGTH by COLUMN_LENGTH board.
@@ -93,6 +94,13 @@ function initPlayers() {
         let playerDeck = shuffleDeck(decks.pop());
 
         players.push({name: playerName, birthdate: playerBirthdate, deck: playerDeck, nbWonRounds: 0, nbWonGames: 0});
+    }
+
+    // Set the goal if there are only two players.
+    if(players.length === 2){
+        streakLengthGoal = 5;
+    }else{
+        streakLengthGoal = 4;
     }
 
 }
